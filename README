@@ -1,6 +1,2 @@
-The stochgame module provides tools for working with two player stochastic games.  Most
-important are the class StochGame for representing such games and the function
-policy_iteration, which solves two player zero-sum stochastic games with discounted
-payoffs (using a policy iteration algorithm due to Raghavan and Syed) or average payoffs
-(using a policy iteration algorithm due to Bourque and Raghavan).
+The stochgame module provides tools for working with two player stochastic games.  Most important are the class StochGame for representing such games and the function policy_iteration, which solves two player zero-sum stochastic games with discounted payoffs (using a policy iteration algorithm due to Raghavan and Syed) or average payoffs (using a policy iteration algorithm due to Bourque and Raghavan).
 

@@ -32,7 +32,11 @@ A utility module to provide tools for working with stochastic matrices.
 ## todo
 # - fix cesaro_limit to use ergodic_classes function, rather than "ergodicize"
 
-from numpy import matrix, zeros_like, sum, delete, zeros, ones, identity
+# from numpy import matrix, zeros_like, sum, delete, zeros, ones, identity,\
+#asmatrix
+
+import numpy as np
+
 from numpy.linalg import solve
 
 # Utility functions for this module
@@ -53,7 +57,7 @@ def is_stochastic(P, tol=.1e-5):
     #    return False
 
     # If any rows don't sum to one, its not a stochastic matrix.
-    rowsums = sum(P, axis = 1).A1.tolist()
+    rowsums = np.sum(P, axis = 1).A1.tolist()
     for row in range(len(rowsums)):
         # magic comparison!
         if abs(rowsums[row] - 1) > tol:
@@ -84,7 +88,7 @@ def permutation( perm ):
 
     N = len(perm)
 
-    P = zeros( (N, N) )
+    P = np.zeros( (N, N) )
 
     for i in range(N):
         P[i, perm[i]] = 1
@@ -132,7 +136,7 @@ def ergodicize(P):
     Probably shouldn't be called other than by the function ergodic_classes.
     """
 
-    ssP = StateSetMatrix(matrix(P.__array__()))
+    ssP = StateSetMatrix(np.matrix(P.__array__()))
     
     # Step 1 - mark absorbing states as ergodic and mark any states which 
     # have access to them as transient
@@ -209,9 +213,9 @@ def cesaro_limit(P, ecP=None):
     Intended as a function to be used by the property lim of stomat class.
     """
 
-    Q = matrix(P.__array__()) 
+    Q = np.matrix(P.__array__()) 
     N = Q.shape[0]
-    Qstar = zeros_like(Q)
+    Qstar = np.zeros_like(Q)
 
 
     if ecP:
@@ -235,16 +239,16 @@ def cesaro_limit(P, ecP=None):
         erg_cls = ecQ.state_set[ind]
         q = submatrix(Q, erg_cls, erg_cls)
         n = q.shape[0]
-        J = ones( (n,n) ) - identity(n)
-        b = ones( (n,1) )
+        J = np.ones( (n,n) ) - np.identity(n)
+        b = np.ones( (n,1) )
         pi = solve( q.T + J, b)
-        qstar = matrix( pi.T.tolist()*n )
+        qstar = np.matrix( pi.T.tolist()*n )
 
         row_ind = list(erg_cls[i] for i in range(n) for j in range(n))
-        row_ind = matrix(row_ind).reshape( (n,n) )
+        row_ind = np.matrix(row_ind).reshape( (n,n) )
 
         col_ind = list(erg_cls[j] for i in range(n) for j in range(n))
-        col_ind = matrix(col_ind).reshape( (n,n) )
+        col_ind = np.matrix(col_ind).reshape( (n,n) )
         Qstar[ row_ind, col_ind ] = qstar
 
         # now calculate the stationary probabilities conditional on starting in
@@ -259,13 +263,13 @@ def cesaro_limit(P, ecP=None):
            # P_{L+1, l} from Filar - the transition matrix from transient classes
            # to the ergodic class l ("ell")
 
-           qstar_te = (identity(n_trans) - qtrans).I*qtranserg*qstar
+           qstar_te = (np.identity(n_trans) - qtrans).I*qtranserg*qstar
 
            row_ind = list(trans_cls[i] for i in range(n_trans) for j in range(n))
-           row_ind = matrix(row_ind).reshape( (n_trans, n) )
+           row_ind = np.matrix(row_ind).reshape( (n_trans, n) )
 
            col_ind = list(erg_cls[j] for i in range(n_trans) for j in range(n) )
-           col_ind = matrix(col_ind).reshape(n_trans, n)
+           col_ind = np.matrix(col_ind).reshape(n_trans, n)
 
            Qstar[ row_ind, col_ind] = qstar_te
         
@@ -340,8 +344,8 @@ class StateSetMatrix:
                 if ind not in gonerlist )
 
         # delete the rows and columns of the matrix and state sets in <gonerlist>
-        newP = delete(newP, gonerlist, 0)
-        newP = delete(newP, gonerlist, 1)
+        newP = np.delete(newP, gonerlist, 0)
+        newP = np.delete(newP, gonerlist, 1)
 
         self.matrix = zero_oneify(newP)
 
@@ -417,22 +421,29 @@ class StateSetMatrix:
 
         self.reorder_indices( neworder + [current_ind] )
 
-class stomat(matrix):
+class stomat(np.matrix):
     """ Defines a stochastic matrix class.  """
 
 #     def __init__(self,data,dtype="float64",copy=False):
 #         matrix.__init__(self, data, dtype, copy)
 
-    def __new__(subtype, data, dtype="float64", copy=False):
-        M = matrix(data, dtype=dtype,copy=copy)
-        if is_stochastic(M):
-            M = M.view(subtype)
+    def __new__(subtype, data, dtype="float64", copy=True):
 
-            return M
+        if is_stochastic(np.asmatrix(data)):
+
+            if isinstance(data, np.matrix):
+                data = np.asarray(data)
+                return np.matrix.__new__(subtype,data,dtype,copy)
+
+            else:
+                return np.matrix.__new__(subtype,data,dtype,copy)
+
         else:
-            raise ValueError, "Non-stochastic matrix"
+            return np.matrix.__new__(np.matrix,data,dtype,copy)
 
     def __array_finalize__(self,obj):
+
+        np.matrix.__array_finalize__(self,obj)
 
         self._classes = None
         self._limit = None
@@ -441,6 +452,37 @@ class stomat(matrix):
     def __repr__(self):
         s = repr(self.__array__()).replace('array', 'stomat')
         return s
+
+    def __mul__(self,other):
+
+        prod = np.matrix.__mul__(self,other)
+        
+        if isinstance(other,stomat):
+            return prod.view(stomat)
+        else:
+            return prod.view(np.matrix)
+
+    def __rmul__(self,other):
+
+        prod = np.matrix.__rmul__(self, other)
+
+        if isinstance(stomat):
+            return prod.view(stomat)
+        else:
+            return prod.view(np.matrix)
+
+    def __getitem__(self,index):
+
+        out = np.matrix.__getitem__(self,index)
+
+        if is_stochastic(out):
+            return out
+        else:
+            return out.view(np.matrix)
+
+
+    def __getslice__(self,i,j):
+        return self.__getitem__(slice(i,j))
 
     def get_classes(self):
         
@@ -461,7 +503,7 @@ class stomat(matrix):
 
         if self._deviation == None:
             N = self.shape[0]
-            self._deviation = (identity(N) - self.__array__() 
+            self._deviation = (np.identity(N) - self.__array__() 
                     + self.lim).I - self.lim
 
         return self._deviation

@@ -174,10 +174,11 @@ class Outcome(MultiList):
 
     def __rmul__(self,other):
 
-        try:
-            return Outcome( [other*self['p1'], other*self['p2']] )
-        except TypeError:
-            return other.__mult__(self)
+        return Outcome( [other*self['p1'], other*self['p2']] )
+#         try:
+#             return Outcome( [other*self['p1'], other*self['p2']] )
+#         except TypeError:
+#             return other.__mult__(self)
     
     def pretty(self, decimals=4, showboth=False):
         """

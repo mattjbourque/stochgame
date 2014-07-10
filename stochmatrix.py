@@ -457,8 +457,12 @@ class stomat(np.matrix):
 
         prod = np.matrix.__mul__(self,other)
         
-        if isinstance(other,stomat):
+        if prod is NotImplemented:
+            return prod
+
+        elif isinstance(other,stomat):
             return prod.view(stomat)
+
         else:
             return prod.view(np.matrix)
 

@@ -37,7 +37,6 @@ from numpy.random.mtrand import dirichlet as _dirichlet
 from numpy.random import random_integers as _randint
 from numpy.random import random as _randnum
 from random import choice as _choice
-from scitools.numpyutils import cut_noise as _cut_noise
 
 def random_transition(n,k,a,decimals):
     """

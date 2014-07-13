@@ -52,7 +52,7 @@ class CycleError(Error):
 
 ##########################
 
-def equal(x,y, tol=1e-10):
+def equal(x,y, tol=1e-6):
     """Returns True if |x - y| < tol"""
     
     x = float(x)

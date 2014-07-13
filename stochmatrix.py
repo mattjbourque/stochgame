@@ -470,7 +470,7 @@ class stomat(np.matrix):
 
         prod = np.matrix.__rmul__(self, other)
 
-        if isinstance(stomat):
+        if isinstance(other,stomat):
             return prod.view(stomat)
         else:
             return prod.view(np.matrix)

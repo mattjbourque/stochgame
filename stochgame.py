@@ -630,7 +630,7 @@ def read_stochgame_file(filename):
 
     return StochGame(D)
 
-def adj_improve_discount(G, current, discount, minimize=False):
+def improve_discount(G, current, discount, minimize=False):
     """
     Checks for an adjacent improvement using the discount improvement criteria
     based on [Blackwell 1962].  Returns an improvement if there is one.  If
@@ -646,7 +646,7 @@ def adj_improve_discount(G, current, discount, minimize=False):
 
     See Also
     --------
-    adj_improve_average, PolicyIterator, policy_iteration
+    improve_average, PolicyIterator, policy_iteration
 
     Note
     ----
@@ -700,7 +700,7 @@ def adj_improve_discount(G, current, discount, minimize=False):
 
     return next_s
 
-def adj_improve_average(G, current, minimize=False, returnE=False):
+def improve_average(G, current, minimize=False, returnE=False):
     """
     Checks for a (non-adjacent) improvement using the average improvement criteria
     based on [Blackwell 1962].  If there is an improvement, returns it alone if
@@ -711,7 +711,7 @@ def adj_improve_average(G, current, minimize=False, returnE=False):
     which both of Blackwell's criteria hold with equality.
 
     returnE should be True when this is called as a first step for finding
-    1-optimal strategies with adj_improve_one.
+    1-optimal strategies with improve_one.
 
     Parameters
     ----------
@@ -722,7 +722,7 @@ def adj_improve_average(G, current, minimize=False, returnE=False):
 
     See Also
     --------
-    adj_improve_discount, PolicyIterator, policy_iteration
+    improve_discount, PolicyIterator, policy_iteration
     
     Note
     ----
@@ -811,7 +811,7 @@ def adj_improve_average(G, current, minimize=False, returnE=False):
     else:
         return next_s
 
-def adj_improve_one(G, current, E, minimize=False):
+def improve_one(G, current, E, minimize=False):
     """
     Checks for a (non-adjacent) improvement using the improvement criteria
     based on [Veinott 1965].  If there is an improvement, returns a tuple
@@ -830,7 +830,7 @@ def adj_improve_one(G, current, E, minimize=False):
 
     See Also
     --------
-    adj_improve_discount, PolicyIterator, policy_iteration
+    improve_discount, PolicyIterator, policy_iteration
     
     Note
     ----
@@ -903,7 +903,7 @@ class PolicyIterator(object):
 
     See Also
     --------
-    adj_improve_average, adj_improve_discount
+    improve_average, improve_discount
 
     Examples
     --------
@@ -946,17 +946,17 @@ class PolicyIterator(object):
             
             old = _ml.Strategy(self.current)
             self.current, self.E1 =\
-                adj_improve_average(self.game,self.current,minimize=False,returnE=True)
+                improve_average(self.game,self.current,minimize=False,returnE=True)
 
             if self.current == old and self.E1 != None and self.check_one_opt:
-                self.current = adj_improve_one(self.game,self.current,
+                self.current = improve_one(self.game,self.current,
                         self.E1,minimize=False)
                 if self.current != old:
                     self.last_was_degen = True
             
             if self.current == old:
                 self.current, self.E2 =\
-                    adj_improve_average(self.game,self.current,minimize=True,returnE=True)
+                    improve_average(self.game,self.current,minimize=True,returnE=True)
 
             else:
                 return self.current
@@ -969,12 +969,12 @@ class PolicyIterator(object):
         elif 0 <= self.discount < 1:
             old = _ml.Strategy(self.current)
             self.current =\
-                adj_improve_discount(self.game,self.current,
+                improve_discount(self.game,self.current,
                         discount = self.discount,minimize=False)
 
             if self.current == old:
                 self.current =\
-                    adj_improve_discount(self.game,self.current,
+                    improve_discount(self.game,self.current,
                             discount = self.discount, minimize=True)
             else:
                 return self.current
@@ -1018,7 +1018,7 @@ def policy_iteration(G,start=None,discount=None,verbose=True, \
 
     See Also
     --------
-    adj_improve_discount, adj_improve_average
+    improve_discount, improve_average
 
     Examples
     --------
@@ -1099,103 +1099,3 @@ def gametable(G):
         print pair
 
 
-def multi_improve_average(G, current, minimize=False, returnE=False):
-    """
-    Checks for an (non-adjacent) improvement using the average improvement criteria
-    based on [Blackwell 1962].  If there is an improvement, returns it alone if
-    returnE is False, or a tuple consisting of the improved strategy and None
-    if returnE is True.  If there is not an improved strategy and returnE is
-    False, returns the existing strategy; if returnE is true, gives a tupe of
-    the existing strategy and a list of lists of actions in each state for
-    which both of Blackwell's criteria hold with equality.
-
-    returnE should be True when this is called as a first step for finding
-    1-optimal strategies with adj_improve_one.
-
-    Parameters
-    ----------
-    G : a StochGame object representing a zero sum game of perfect information.
-    current : a multilist.Strategy object giving a pure stationary strategy for the
-        players in G
-    minimize: if True, looks for an improvement for the minimizer
-
-    See Also
-    --------
-    adj_improve_discount, PolicyIterator, policy_iteration
-    
-    Note
-    ----
-    This algorithm only works for perfect information zero sum games, but the code does
-    not currently check whether G has this property.
-
-    """
-
-    if minimize:
-        the_player = 'p2'
-    else:
-        the_player = 'p1'
-
-    next_s = deepcopy(current)
-    E = [[] for i in range(G.num_states)]
-    
-    # x and y are as defined in Blackwell:
-    # x(f) = Q(f)*r(f), where Q(f) is the Cesaro limit matrix
-    # y(f) = H(f)*r(f), where H(f) is the deviation matrix
-    
-    x_curr = G.payoff(current)[the_player]
-
-    for state in G.belonging_to(the_player):
-        a = 0 if the_player=='p2' else current['p1'][state]
-        b = 0 if the_player=='p1' else current['p2'][state]
-        while [a,b][0 if the_player=='p1' else 1] < G.num_actions[the_player][state]:
-            if a == current['p1'][state] and the_player == 'p1':
-                a += 1
-            elif b == current['p2'][state] and the_player  == 'p2':
-                b += 1
-            
-            else:
-                p = G.data[state][a,b]['t']
-                r = G.data[state][a,b][the_player]
-
-                new1 = p*x_curr
-                old1 = x_curr[state]
-
-                if (not equal(new1,old1) and new1 > old1 ):
-                    if the_player == 'p1':
-                        next_s[the_player][state] = a
-                    if the_player == 'p2':
-                        next_s[the_player][state] = b
-                    
-                    break
-
-                elif equal(new1, old1):
-
-                    y_curr = G.bias(current)[the_player]
-                    new2 = r + p*y_curr
-                    old2 = x_curr[state] + y_curr[state]
-
-                    if (not equal(new2, old2) and new2 > old2):
-                        if the_player == 'p1':
-                            next_s[the_player][state] = a
-                        if the_player == 'p2':
-                            next_s[the_player][state] = b
-
-                        break
-
-                    else:
-                        if equal(new2, old2):
-                            E[state].append( [a,b][0 if the_player=='p1' else 1] )
-                        if the_player == 'p1':
-                            a += 1
-                        elif  the_player  == 'p2':
-                            b += 1
-                else:
-                    if the_player == 'p1':
-                        a += 1
-                    elif the_player  == 'p2':
-                        b += 1
-
-    if returnE:
-        return next_s, E
-    else:
-        return next_s

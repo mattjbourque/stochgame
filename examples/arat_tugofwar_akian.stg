@@ -1,0 +1,163 @@
+[5,5,5,5,5] # player 1 number of actions
+[5, 5, 5, 5, 5] # player 2 number of actions
+
+# state 0
+# action 0 for player 2
+(  1.0, -1.0, [1.0, 0.0, 0.0, 0.0, 0.0])# action 0 for player 1
+(  0.0,  0.0, [0.5, 0.5, 0.0, 0.0, 0.0])# action 1 for player 1
+(  0.5, -0.5, [0.5, 0.0, 0.5, 0.0, 0.0])# action 2 for player 1
+(  0.5, -0.5, [0.5, 0.0, 0.0, 0.5, 0.0])# action 3 for player 1
+(  0.5, -0.5, [0.5, 0.0, 0.0, 0.0, 0.5])# action 4 for player 1
+# action 1 for player 2
+(  0.0,  0.0, [0.5, 0.5, 0.0, 0.0, 0.0])# action 0 for player 1
+( -1.0,  1.0, [0.0, 1.0, 0.0, 0.0, 0.0])# action 1 for player 1
+( -0.5,  0.5, [0.0, 0.5, 0.5, 0.0, 0.0])# action 2 for player 1
+( -0.5,  0.5, [0.0, 0.5, 0.0, 0.5, 0.0])# action 3 for player 1
+( -0.5,  0.5, [0.0, 0.5, 0.0, 0.0, 0.5])# action 4 for player 1
+# action 2 for player 2
+(  0.5, -0.5, [0.5, 0.0, 0.5, 0.0, 0.0])# action 0 for player 1
+( -0.5,  0.5, [0.0, 0.5, 0.5, 0.0, 0.0])# action 1 for player 1
+(  0.0,  0.0, [0.0, 0.0, 1.0, 0.0, 0.0])# action 2 for player 1
+(  0.0,  0.0, [0.0, 0.0, 0.5, 0.5, 0.0])# action 3 for player 1
+(  0.0,  0.0, [0.0, 0.0, 0.5, 0.0, 0.5])# action 4 for player 1
+# action 3 for player 2
+(  0.5, -0.5, [0.5, 0.0, 0.0, 0.5, 0.0])# action 0 for player 1
+( -0.5,  0.5, [0.0, 0.5, 0.0, 0.5, 0.0])# action 1 for player 1
+(  0.0,  0.0, [0.0, 0.0, 0.5, 0.5, 0.0])# action 2 for player 1
+(  0.0,  0.0, [0.0, 0.0, 0.0, 1.0, 0.0])# action 3 for player 1
+(  0.0,  0.0, [0.0, 0.0, 0.0, 0.5, 0.5])# action 4 for player 1
+# action 4 for player 2
+(0.5, -0.5, [0.5, 0.0, 0.0, 0.0, 0.5])# action 0 for player 1
+(-0.5, 0.5, [0.0, 0.5, 0.0, 0.0, 0.5])# action 1 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.5, 0.0, 0.5])# action 2 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.0, 0.5, 0.5])# action 3 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.0, 0.0, 1.0])# action 4 for player 1
+
+# state 1
+# action 0 for player 2
+(1.0, -1.0, [1.0, 0.0, 0.0, 0.0, 0.0])# action 0 for player 1
+(0.0, 0.0, [0.5, 0.5, 0.0, 0.0, 0.0])# action 1 for player 1
+(0.5, -0.5, [0.5, 0.0, 0.5, 0.0, 0.0])# action 2 for player 1
+(0.5, -0.5, [0.5, 0.0, 0.0, 0.5, 0.0])# action 3 for player 1
+(0.5, -0.5, [0.5, 0.0, 0.0, 0.0, 0.5])# action 4 for player 1
+# action 1 for player 2
+(0.0, 0.0, [0.5, 0.5, 0.0, 0.0, 0.0])# action 0 for player 1
+(-1.0, 1.0, [0.0, 1.0, 0.0, 0.0, 0.0])# action 1 for player 1
+(-0.5, 0.5, [0.0, 0.5, 0.5, 0.0, 0.0])# action 2 for player 1
+(-0.5, 0.5, [0.0, 0.5, 0.0, 0.5, 0.0])# action 3 for player 1
+(-0.5, 0.5, [0.0, 0.5, 0.0, 0.0, 0.5])# action 4 for player 1
+# action 2 for player 2
+(0.5, -0.5, [0.5, 0.0, 0.5, 0.0, 0.0])# action 0 for player 1
+(-0.5, 0.5, [0.0, 0.5, 0.5, 0.0, 0.0])# action 1 for player 1
+(0.0, 0.0, [0.0, 0.0, 1.0, 0.0, 0.0])# action 2 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.5, 0.5, 0.0])# action 3 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.5, 0.0, 0.5])# action 4 for player 1
+# action 3 for player 2
+(0.5, -0.5, [0.5, 0.0, 0.0, 0.5, 0.0])# action 0 for player 1
+(-0.5, 0.5, [0.0, 0.5, 0.0, 0.5, 0.0])# action 1 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.5, 0.5, 0.0])# action 2 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.0, 1.0, 0.0])# action 3 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.0, 0.5, 0.5])# action 4 for player 1
+# action 4 for player 2
+(0.5, -0.5, [0.5, 0.0, 0.0, 0.0, 0.5])# action 0 for player 1
+(-0.5, 0.5, [0.0, 0.5, 0.0, 0.0, 0.5])# action 1 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.5, 0.0, 0.5])# action 2 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.0, 0.5, 0.5])# action 3 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.0, 0.0, 1.0])# action 4 for player 1
+
+# state 2
+# action 0 for player 2
+(0.0, 0.0, [1.0, 0.0, 0.0, 0.0, 0.0])# action 0 for player 1
+(0.0, 0.0, [0.5, 0.5, 0.0, 0.0, 0.0])# action 1 for player 1
+(0.5, -0.5, [0.5, 0.0, 0.5, 0.0, 0.0])# action 2 for player 1
+(-0.5, 0.5, [0.5, 0.0, 0.0, 0.5, 0.0])# action 3 for player 1
+(0.0, 0.0, [0.5, 0.0, 0.0, 0.0, 0.5])# action 4 for player 1
+# action 1 for player 2
+(0.0, 0.0, [0.5, 0.5, 0.0, 0.0, 0.0])# action 0 for player 1
+(0.0, 0.0, [0.0, 1.0, 0.0, 0.0, 0.0])# action 1 for player 1
+(0.5, -0.5, [0.0, 0.5, 0.5, 0.0, 0.0])# action 2 for player 1
+(-0.5, 0.5, [0.0, 0.5, 0.0, 0.5, 0.0])# action 3 for player 1
+(0.0, 0.0, [0.0, 0.5, 0.0, 0.0, 0.5])# action 4 for player 1
+# action 2 for player 2
+(0.5, -0.5, [0.5, 0.0, 0.5, 0.0, 0.0])# action 0 for player 1
+(0.5, -0.5, [0.0, 0.5, 0.5, 0.0, 0.0])# action 1 for player 1
+(1.0, -1.0, [0.0, 0.0, 1.0, 0.0, 0.0])# action 2 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.5, 0.5, 0.0])# action 3 for player 1
+(0.5, -0.5, [0.0, 0.0, 0.5, 0.0, 0.5])# action 4 for player 1
+# action 3 for player 2
+(-0.5, 0.5, [0.5, 0.0, 0.0, 0.5, 0.0])# action 0 for player 1
+(-0.5, 0.5, [0.0, 0.5, 0.0, 0.5, 0.0])# action 1 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.5, 0.5, 0.0])# action 2 for player 1
+(-1.0, 1.0, [0.0, 0.0, 0.0, 1.0, 0.0])# action 3 for player 1
+(-0.5, 0.5, [0.0, 0.0, 0.0, 0.5, 0.5])# action 4 for player 1
+# action 4 for player 2
+(0.0, 0.0, [0.5, 0.0, 0.0, 0.0, 0.5])# action 0 for player 1
+(0.0, 0.0, [0.0, 0.5, 0.0, 0.0, 0.5])# action 1 for player 1
+(0.5, -0.5, [0.0, 0.0, 0.5, 0.0, 0.5])# action 2 for player 1
+(-0.5, 0.5, [0.0, 0.0, 0.0, 0.5, 0.5])# action 3 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.0, 0.0, 1.0])# action 4 for player 1
+
+# state 3
+# action 0 for player 2
+(0.0, 0.0, [1.0, 0.0, 0.0, 0.0, 0.0])# action 0 for player 1
+(0.0, 0.0, [0.5, 0.5, 0.0, 0.0, 0.0])# action 1 for player 1
+(0.5, -0.5, [0.5, 0.0, 0.5, 0.0, 0.0])# action 2 for player 1
+(-0.5, 0.5, [0.5, 0.0, 0.0, 0.5, 0.0])# action 3 for player 1
+(0.0, 0.0, [0.5, 0.0, 0.0, 0.0, 0.5])# action 4 for player 1
+# action 1 for player 2
+(0.0, 0.0, [0.5, 0.5, 0.0, 0.0, 0.0])# action 0 for player 1
+(0.0, 0.0, [0.0, 1.0, 0.0, 0.0, 0.0])# action 1 for player 1
+(0.5, -0.5, [0.0, 0.5, 0.5, 0.0, 0.0])# action 2 for player 1
+(-0.5, 0.5, [0.0, 0.5, 0.0, 0.5, 0.0])# action 3 for player 1
+(0.0, 0.0, [0.0, 0.5, 0.0, 0.0, 0.5])# action 4 for player 1
+# action 2 for player 2
+(0.5, -0.5, [0.5, 0.0, 0.5, 0.0, 0.0])# action 0 for player 1
+(0.5, -0.5, [0.0, 0.5, 0.5, 0.0, 0.0])# action 1 for player 1
+(1.0, -1.0, [0.0, 0.0, 1.0, 0.0, 0.0])# action 2 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.5, 0.5, 0.0])# action 3 for player 1
+(0.5, -0.5, [0.0, 0.0, 0.5, 0.0, 0.5])# action 4 for player 1
+# action 3 for player 2
+(-0.5, 0.5, [0.5, 0.0, 0.0, 0.5, 0.0])# action 0 for player 1
+(-0.5, 0.5, [0.0, 0.5, 0.0, 0.5, 0.0])# action 1 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.5, 0.5, 0.0])# action 2 for player 1
+(-1.0, 1.0, [0.0, 0.0, 0.0, 1.0, 0.0])# action 3 for player 1
+(-0.5, 0.5, [0.0, 0.0, 0.0, 0.5, 0.5])# action 4 for player 1
+# action 4 for player 2
+(0.0, 0.0, [0.5, 0.0, 0.0, 0.0, 0.5])# action 0 for player 1
+(0.0, 0.0, [0.0, 0.5, 0.0, 0.0, 0.5])# action 1 for player 1
+(0.5, -0.5, [0.0, 0.0, 0.5, 0.0, 0.5])# action 2 for player 1
+(-0.5, 0.5, [0.0, 0.0, 0.0, 0.5, 0.5])# action 3 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.0, 0.0, 1.0])# action 4 for player 1
+
+# state 4
+# action 0 for player 2
+(0.0, 0.0, [1.0, 0.0, 0.0, 0.0, 0.0])# action 0 for player 1
+(-0.5, 0.5, [0.5, 0.5, 0.0, 0.0, 0.0])# action 1 for player 1
+(0.0, 0.0, [0.5, 0.0, 0.5, 0.0, 0.0])# action 2 for player 1
+(-0.5, 0.5, [0.5, 0.0, 0.0, 0.5, 0.0])# action 3 for player 1
+(0.5, -0.5, [0.5, 0.0, 0.0, 0.0, 0.5])# action 4 for player 1
+# action 1 for player 2
+(-0.5, 0.5, [0.5, 0.5, 0.0, 0.0, 0.0])# action 0 for player 1
+(-1.0, 1.0, [0.0, 1.0, 0.0, 0.0, 0.0])# action 1 for player 1
+(-0.5, 0.5, [0.0, 0.5, 0.5, 0.0, 0.0])# action 2 for player 1
+(-1.0, 1.0, [0.0, 0.5, 0.0, 0.5, 0.0])# action 3 for player 1
+(0.0, 0.0, [0.0, 0.5, 0.0, 0.0, 0.5])# action 4 for player 1
+# action 2 for player 2
+(0.0, 0.0, [0.5, 0.0, 0.5, 0.0, 0.0])# action 0 for player 1
+(-0.5, 0.5, [0.0, 0.5, 0.5, 0.0, 0.0])# action 1 for player 1
+(0.0, 0.0, [0.0, 0.0, 1.0, 0.0, 0.0])# action 2 for player 1
+(-0.5, 0.5, [0.0, 0.0, 0.5, 0.5, 0.0])# action 3 for player 1
+(0.5, -0.5, [0.0, 0.0, 0.5, 0.0, 0.5])# action 4 for player 1
+# action 3 for player 2
+(-0.5, 0.5, [0.5, 0.0, 0.0, 0.5, 0.0])# action 0 for player 1
+(-1.0, 1.0, [0.0, 0.5, 0.0, 0.5, 0.0])# action 1 for player 1
+(-0.5, 0.5, [0.0, 0.0, 0.5, 0.5, 0.0])# action 2 for player 1
+(-1.0, 1.0, [0.0, 0.0, 0.0, 1.0, 0.0])# action 3 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.0, 0.5, 0.5])# action 4 for player 1
+# action 4 for player 2
+(0.5, -0.5, [0.5, 0.0, 0.0, 0.0, 0.5])# action 0 for player 1
+(0.0, 0.0, [0.0, 0.5, 0.0, 0.0, 0.5])# action 1 for player 1
+(0.5, -0.5, [0.0, 0.0, 0.5, 0.0, 0.5])# action 2 for player 1
+(0.0, 0.0, [0.0, 0.0, 0.0, 0.5, 0.5])# action 3 for player 1
+(1.0, -1.0, [0.0, 0.0, 0.0, 0.0, 1.0])# action 4 for player 1
+

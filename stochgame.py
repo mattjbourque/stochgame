@@ -673,7 +673,7 @@ def adj_improve_discount(G, current, discount, minimize=False):
         b = 0 if the_player=='p1' else current['p2'][state]
         while [a,b][0 if the_player=='p1' else 1] < G.num_actions[the_player][state]:
             if a == current['p1'][state] and the_player == 'p1':
-                a += 1#{{{
+                a += 1
             elif b == current['p2'][state] and the_player == 'p2':
                 b += 1
             else:
@@ -690,7 +690,8 @@ def adj_improve_discount(G, current, discount, minimize=False):
                         next_s[the_player][state] = a
                     elif the_player == 'p2':
                         next_s[the_player][state] = b
-                    return next_s
+                    break
+                    #return next_s
                 else:
                     if the_player == 'p1':
                         a += 1
@@ -742,7 +743,7 @@ def adj_improve_average(G, current, minimize=False, returnE=False):
     # x(f) = Q(f)*r(f), where Q(f) is the Cesaro limit matrix
     # y(f) = H(f)*r(f), where H(f) is the deviation matrix
     
-    x_curr = G.payoff(current)[the_player]#}}}
+    x_curr = G.payoff(current)[the_player]
 
     for state in G.belonging_to(the_player):
         a = 0 if the_player=='p2' else current['p1'][state]

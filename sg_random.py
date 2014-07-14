@@ -37,7 +37,6 @@ from numpy.random.mtrand import dirichlet as _dirichlet
 from numpy.random import random_integers as _randint
 from numpy.random import random as _randnum
 from random import choice as _choice
-from scitools.numpyutils import cut_noise as _cut_noise
 
 def random_transition(n,k,a,decimals):
     """
@@ -84,7 +83,7 @@ def float_rewards(rbound,N):
 
 def random_game(actions1, actions2, rbound = 5, integer_payoffs=True, a=0.2, decimals=2, zerosum=True):
     """
-    A function for randomly generating two-player stochastic games with
+    A function for randomly generating two-player zero sum stochastic games with
     integer payoffs.
 
     Parameters
@@ -92,7 +91,7 @@ def random_game(actions1, actions2, rbound = 5, integer_payoffs=True, a=0.2, dec
 
     actions1 : list giving the number of actions for player 1 in each state
 
-    actions1 : list giving the number of actions for player 1 in each state 
+    actions2 : list giving the number of actions for player 2 in each state 
 
     rbound: Bound on absolute value of immediate rewards.
 
@@ -131,5 +130,56 @@ def random_game(actions1, actions2, rbound = 5, integer_payoffs=True, a=0.2, dec
     
     return StochGame(actions1, actions2, data)
 
-    
+def random_arat(actions1, actions2, rbound = 5, p = .5, q= .5, integer_payoffs=True, a=0.2, decimals=2):
+    """
+    A function for randomly generating two-player zero sum ARAT stochastic games with
+    integer payoffs.
 
+    Parameters
+    ----------
+
+    actions1 : list giving the number of actions for player 1 in each state
+
+    actions2 : list giving the number of actions for player 2 in each state 
+
+    rbound: Bound on absolute value of immediate rewards.
+
+    p,q: weights for two players' contributions. Normalized to sum to 1
+
+    integer_payoffs: boolean.  Should the payoffs be integers?
+
+    a : concentration parameter passed to random_transition
+
+    decimals : rounding parameter passed to random_transition
+
+    """
+    
+    if len(actions1) != len(actions2):
+        raise ValueError("Mismatch in number of states for two players.")
+    else:
+        n = len(actions1)
+        total_actions = sum(actions1) + sum(actions2)
+
+    norm = float(p+q)
+    p = p/norm
+    q= q/norm
+
+    data = []
+
+    if integer_payoffs:
+        rewards =  integer_rewards
+    else:
+        rewards = float_rewards
+
+    for state in range(n):
+        reward_rowpart = rewards(rbound,actions1[state])
+        trans_rowpart = random_transition(actions1[state],n,a,decimals)
+        reward_colpart = rewards(rbound,actions2[state])
+        trans_colpart = random_transition(actions2[state],n,a,decimals)
+        for column in range(actions2[state]):
+            for row in range(actions1[state]):
+                r = p*reward_rowpart[row] + q*reward_colpart[column]
+                trans = p*trans_rowpart[row] + q*trans_colpart[column]
+                data.append( (r, -r, trans.tolist() ) )
+    
+    return StochGame(actions1, actions2, data)

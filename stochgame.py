@@ -29,7 +29,8 @@
 """
 Provides tools for working with two player stochastic games.  Most important
 are the class StochGame for representing such games and the function
-policy_iteration for solving them using an algorithm due to Raghavan and Syed.
+policy_iteration for solving them using an algorithm due to Raghavan and Syed
+for the discounted case and Bourque and Raghavan in the average case.
 """
 import stochmatrix as _st
 import numpy as _np
@@ -51,13 +52,15 @@ class CycleError(Error):
     pass
 
 ##########################
+# Utility functions for this module
+##########################
 
-def equal(x,y, tol=1e-10):
+def equal(x,y, tol=1e-6):
     """Returns True if |x - y| < tol"""
     
     x = float(x)
     y = float(y)
-
+    
     if abs(x - y) < tol:
         return True
     else:
@@ -91,6 +94,9 @@ def pure_strategy_list(p1_num_actions, p2_num_actions):
                    for a1 in range(p1_num_actions[s])]
     
     return L
+
+######
+
 
 class StochGame(object):
     """
@@ -188,7 +194,6 @@ class StochGame(object):
         out +=  ")"
 
         return out
-
 
     def transition(self, state, s1, s2):
         """
@@ -417,7 +422,7 @@ class StochGame(object):
         D = self.transitionmatrix(strategy).D
         r = self.reward(strategy)
 
-        return D*(-1)*r
+        return D**2*(-1)*r
 
     def belonging_to(self, player):
         """
@@ -482,6 +487,64 @@ class StochGame(object):
 
             if p1state < 0:
                 p1done = True
+
+class MDP(StochGame):
+    """
+    Defines a MDP class representing stochastic games in which at most one
+    player has a choice of actions available.
+    """
+
+    def __init__(self, num_actions, data):
+
+        num_states = len(num_actions)
+        dummy = [1]*num_states
+
+        StochGame.__init__(self, num_actions,dummy,data)
+
+    def __repr__(self):
+
+        L = []
+        for state in range(self.num_states): 
+            for datum in self.data[state].flat:
+                L.append(datum)
+
+        out = "MDP("
+        out += str(self.num_actions['p1']) + ", " \
+            + str(self.num_actions['p2']) + ", "
+        out += str(L)
+        out +=  ")"
+
+        return out
+        
+        
+    def transition(self, state, s):
+        return StochGame.transition(self,state,s,0)
+
+
+    def transitionmatrix(self, strategy):
+        
+        s = sg.Strategy(strategy,[0]*self.num_states)
+        return StochGame.transitionmatrix(self, s)
+
+    def reward(self, strategy):
+        
+        s = sg.Strategy(strategy,[0]*self.num_states)
+        return StochGame.reward(self, s)
+
+    def payoff(self, strategy, discount=None):
+
+        s = sg.Strategy(strategy,[0]*self.num_states)
+        return StochGame.payoff(self, s, discount)['p1']
+
+    def bias(self, strategy):
+
+        s = sg.Strategy(strategy,[0]*self.num_states)
+        return StochGame.bias(self, s)['p1']
+
+    def zee(self, strategy):
+
+        s = sg.Strategy(strategy,[0]*self.num_states)
+        return StochGame.zee(self, s)['p1']
 
 
 def read_stochgame_file(filename):
@@ -638,7 +701,7 @@ def adj_improve_discount(G, current, discount, minimize=False):
 
 def adj_improve_average(G, current, minimize=False, returnE=False):
     """
-    Checks for an adjacent improvement using the average improvement criteria
+    Checks for a (non-adjacent) improvement using the average improvement criteria
     based on [Blackwell 1962].  If there is an improvement, returns it alone if
     returnE is False, or a tuple consisting of the improved strategy and None
     if returnE is True.  If there is not an improved strategy and returnE is
@@ -682,8 +745,8 @@ def adj_improve_average(G, current, minimize=False, returnE=False):
     x_curr = G.payoff(current)[the_player]
 
     for state in G.belonging_to(the_player):
-        a = 0
-        b = 0
+        a = 0 if the_player=='p2' else current['p1'][state]
+        b = 0 if the_player=='p1' else current['p2'][state]
         while [a,b][0 if the_player=='p1' else 1] < G.num_actions[the_player][state]:
             if a == current['p1'][state] and the_player == 'p1':
                 a += 1
@@ -702,11 +765,13 @@ def adj_improve_average(G, current, minimize=False, returnE=False):
                         next_s[the_player][state] = a
                     if the_player == 'p2':
                         next_s[the_player][state] = b
+
+                    break
                     
-                    if returnE:
-                        return next_s, None
-                    else:
-                        return next_s
+#                     if returnE:
+#                         return next_s, None
+#                     else:
+#                         return next_s
 
                 elif equal(new1, old1):
 
@@ -720,10 +785,12 @@ def adj_improve_average(G, current, minimize=False, returnE=False):
                         if the_player == 'p2':
                             next_s[the_player][state] = b
 
-                        if returnE:
-                            return next_s, None
-                        else:
-                            return next_s
+                        break
+
+#                         if returnE:
+#                             return next_s, None
+#                         else:
+#                             return next_s
                     
                     else:
                         if equal(new2, old2):
@@ -745,7 +812,7 @@ def adj_improve_average(G, current, minimize=False, returnE=False):
 
 def adj_improve_one(G, current, E, minimize=False):
     """
-    Checks for an adjacent improvement using the improvement criteria
+    Checks for a (non-adjacent) improvement using the improvement criteria
     based on [Veinott 1965].  If there is an improvement, returns a tuple
     consisting of the improved strategy and None.  If there is not an improved
     strategy, returns the existing strategy and a list of lists of actions in
@@ -777,10 +844,42 @@ def adj_improve_one(G, current, E, minimize=False):
         the_player = 'p1'
 
     next_s = deepcopy(current)
+    num_E = [len(E[i]) for i in range(len(E))]
+    
+    # z is as defined in Veinott:
+    # z(f) = H(f)*(-y(f)), where H(f) is the deviation matrix
+    
+    y_curr = G.bias(current)[the_player]
+    z_curr = G.zee(current)[the_player]
+    
+    for state in G.belonging_to(the_player):
+        a = current['p1'][state]
+        b = current['p2'][state]
+        while E[state]:
+            if the_player == 'p1':
+                a = E[state].pop()
+                b = 0
+            elif the_player == 'p2':
+                b = 0
+                a = E[state].pop()
 
+            p = G.data[state][a,b]['t']
+            new = p*z_curr
+            old = y_curr[state] + z_curr[state]
+
+            if (not equal(new, old) and new > old):
+                if the_player == 'p1':
+                    next_s[the_player][state] = a
+                if the_player == 'p2':
+                    next_s[the_player][state] = b
+
+                #return next_s
+                break
+    return next_s
+                
 class PolicyIterator(object):
     """
-    PolicyIterator(G, start, discount=None)
+    PolicyIterator(G, start, discount=None, check_one_opt=True)
     
     Returns an iterator object which will return improved strategies in a
     perfect information zero sum game until none is available, when it raises a
@@ -796,6 +895,10 @@ class PolicyIterator(object):
     discount : Either 'None' or a discount factor at least zero and less than
         one.  If 'None', checks for limiting average improvements.  If a
         discount factor, checks for discounted improvements.
+    check_one_opt: (Boolean) Should we guarantee a one-optimal policy for
+        player 1 at each iteration using Veinott's algorithm?  Proof of the
+        algorithm seems to require this step, but at least some games are
+        successfully solved without it.
 
     See Also
     --------
@@ -816,22 +919,27 @@ class PolicyIterator(object):
 
     Notes
     -----
-    The algorithm implemented make no sense for non-zero sum or non-perfect
-    information games, but the implementation does not currently check for
-    this.  It is possible that some strange behaviour could result.
-
+    The algorithm implemented is only guaranteed to work on zero-sum two-player
+    games with additive rewards and additive transitions, but we do not check
+    these properties of the game.  If the game is not of this class, the
+    algorithm may cycle.  However, in the event that it does terminate, the
+    strategy pair is optimal, even outside of the class of ARAT games.
     """
 
 
-    def __init__(self, G, start, discount = None):
+    def __init__(self, G, start, discount = None, check_one_opt=True):
 
         self.game = G
         self.current = deepcopy(start)
         self.discount = discount
         self.E1 = None
         self.E2 = None
+        self.last_was_degen=False
+        self.check_one_opt = check_one_opt
 
     def next(self):
+
+        self.last_was_degen=False
 
         if self.discount == None:
             
@@ -839,9 +947,16 @@ class PolicyIterator(object):
             self.current, self.E1 =\
                 adj_improve_average(self.game,self.current,minimize=False,returnE=True)
 
+            if self.current == old and self.E1 != None and self.check_one_opt:
+                self.current = adj_improve_one(self.game,self.current,
+                        self.E1,minimize=False)
+                if self.current != old:
+                    self.last_was_degen = True
+            
             if self.current == old:
                 self.current, self.E2 =\
                     adj_improve_average(self.game,self.current,minimize=True,returnE=True)
+
             else:
                 return self.current
 
@@ -872,8 +987,8 @@ class PolicyIterator(object):
             raise ValueError("""Discount factor must be between zero and
             one.""")
 
-def policy_iteration(G,start,discount=None,verbose=True, \
-        showboth=False, decimals=4):
+def policy_iteration(G,start=None,discount=None,verbose=True, \
+        showboth=False, check_one_opt=True,decimals=4):
     """
     Solves a two player zero sum stochastic game of perfect information. If
     'verbose' is True, prints intermediate strategies and returns a tuple of
@@ -886,12 +1001,18 @@ def policy_iteration(G,start,discount=None,verbose=True, \
     G : A StochGame object representing a two player zero sum game of perfect
         information
     start : A multilist.Strategy object representing a pure stationary strategy; the
-        starting place for the policy iteration algorithm.
+        starting place for the policy iteration algorithm.  If not provided,
+        the strategy pair consisting of the first action listed for each player
+        in each state is assumed; that is, Strategy( [[0]*G.num_states]*2 ).
     discount : Either 'None' or a discount factor at least zero and less than
         one.  If 'None', solves the game using the limiting average criterion.
         Otherwise uses the discounted payoff criterion.
     verbose : boolean.  Print progress information?
     showboth : boolean.  If verbose, show both players' payoffs?
+    check_one_opt: (Boolean) Should we guarantee a one-optimal policy for
+        player 1 at each iteration using Veinott's algorithm?  Proof of the
+        algorithm seems to require this step, but at least some games are
+        successfully solved without it.
     decimals : If verbose, how many decimals to round payoffs to?
 
     See Also
@@ -914,12 +1035,16 @@ def policy_iteration(G,start,discount=None,verbose=True, \
     Outcome([ 4.22222233,  4.22222233], dtype=float32)
 
     """
-    total_strategies = reduce(lambda x,y:x*y,
-            G.num_actions['p1']+G.num_actions['p2'])
+    #total_strategies = reduce(lambda x,y:x*y,
+    #        G.num_actions['p1']+G.num_actions['p2'])
+
+    if start == None:
+        start = [[0]*G.num_states]*2
     start =  Strategy(start)
 
-    pi = PolicyIterator(G, deepcopy(start), discount)
+    pi = PolicyIterator(G, deepcopy(start), discount, check_one_opt)
     iterations = 0
+    degen = 0
     
     s = start
     visited = [s]
@@ -938,7 +1063,10 @@ def policy_iteration(G,start,discount=None,verbose=True, \
         try:
             iterations += 1
             s = pi.next()
+            if pi.last_was_degen:
+                degen += 1
             if s in visited:
+                print s
                 raise CycleError
             else:
                 visited.append(s)
@@ -952,10 +1080,12 @@ def policy_iteration(G,start,discount=None,verbose=True, \
             if discount==None:
                 report += G.bias(s).pretty(decimals, showboth) \
                     + G.zee(s).pretty(decimals, showboth)
+                if pi.last_was_degen:
+                    report += "*"
 
             print report
     
-    return s,pi.E1,pi.E2,iterations
+    return s,pi.E1,pi.E2,iterations, degen
 
 def gametable(G):
     """
@@ -966,3 +1096,105 @@ def gametable(G):
 
     for pair in pure_strategy_list(G.num_actions['p1'], G.num_actions['p2']):
         print pair
+
+
+def multi_improve_average(G, current, minimize=False, returnE=False):
+    """
+    Checks for an (non-adjacent) improvement using the average improvement criteria
+    based on [Blackwell 1962].  If there is an improvement, returns it alone if
+    returnE is False, or a tuple consisting of the improved strategy and None
+    if returnE is True.  If there is not an improved strategy and returnE is
+    False, returns the existing strategy; if returnE is true, gives a tupe of
+    the existing strategy and a list of lists of actions in each state for
+    which both of Blackwell's criteria hold with equality.
+
+    returnE should be True when this is called as a first step for finding
+    1-optimal strategies with adj_improve_one.
+
+    Parameters
+    ----------
+    G : a StochGame object representing a zero sum game of perfect information.
+    current : a multilist.Strategy object giving a pure stationary strategy for the
+        players in G
+    minimize: if True, looks for an improvement for the minimizer
+
+    See Also
+    --------
+    adj_improve_discount, PolicyIterator, policy_iteration
+    
+    Note
+    ----
+    This algorithm only works for perfect information zero sum games, but the code does
+    not currently check whether G has this property.
+
+    """
+
+    if minimize:
+        the_player = 'p2'
+    else:
+        the_player = 'p1'
+
+    next_s = deepcopy(current)
+    E = [[] for i in range(G.num_states)]
+    
+    # x and y are as defined in Blackwell:
+    # x(f) = Q(f)*r(f), where Q(f) is the Cesaro limit matrix
+    # y(f) = H(f)*r(f), where H(f) is the deviation matrix
+    
+    x_curr = G.payoff(current)[the_player]
+
+    for state in G.belonging_to(the_player):
+        a = 0 if the_player=='p2' else current['p1'][state]
+        b = 0 if the_player=='p1' else current['p2'][state]
+        while [a,b][0 if the_player=='p1' else 1] < G.num_actions[the_player][state]:
+            if a == current['p1'][state] and the_player == 'p1':
+                a += 1
+            elif b == current['p2'][state] and the_player  == 'p2':
+                b += 1
+            
+            else:
+                p = G.data[state][a,b]['t']
+                r = G.data[state][a,b][the_player]
+
+                new1 = p*x_curr
+                old1 = x_curr[state]
+
+                if (not equal(new1,old1) and new1 > old1 ):
+                    if the_player == 'p1':
+                        next_s[the_player][state] = a
+                    if the_player == 'p2':
+                        next_s[the_player][state] = b
+                    
+                    break
+
+                elif equal(new1, old1):
+
+                    y_curr = G.bias(current)[the_player]
+                    new2 = r + p*y_curr
+                    old2 = x_curr[state] + y_curr[state]
+
+                    if (not equal(new2, old2) and new2 > old2):
+                        if the_player == 'p1':
+                            next_s[the_player][state] = a
+                        if the_player == 'p2':
+                            next_s[the_player][state] = b
+
+                        break
+
+                    else:
+                        if equal(new2, old2):
+                            E[state].append( [a,b][0 if the_player=='p1' else 1] )
+                        if the_player == 'p1':
+                            a += 1
+                        elif  the_player  == 'p2':
+                            b += 1
+                else:
+                    if the_player == 'p1':
+                        a += 1
+                    elif the_player  == 'p2':
+                        b += 1
+
+    if returnE:
+        return next_s, E
+    else:
+        return next_s
